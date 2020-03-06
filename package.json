@@ -1,68 +1,44 @@
 {
-  "name": "r-shiny-electron",
-  "productName": "r-shiny-electron",
+  "name": "miscl-toolkit-report-app",
+  "productName": "MISCL Toolkit Report Generator",
   "version": "1.0.0",
-  "description": "My Electron application description",
-  "main": "src/index.js",
-  "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "publish": "electron-forge publish",
-    "lint": "eslint src --color"
-  },
+  "description": "Part of the MISCL Toolkit used to generate reports from survey data",
+  "main": "./lib/index.js",
   "keywords": [],
-  "author": "You",
+  "author": "Geoffrey E. Grimm",
   "license": "MIT",
-  "private": true,
-  "config": {
-    "forge": {
-      "make_targets": {
-        "win32": [
-          "squirrel"
-        ],
-        "darwin": [
-          "zip"
-        ]
-      },
-      "electronPackagerConfig": {
-        "packageManager": "npm",
-        "afterCopy": [
-          "./prune-r"
-        ]
-      },
-      "electronWinstallerConfig": {
-        "name": "r_shiny_electron"
-      },
-      "electronInstallerDebian": {},
-      "electronInstallerRedhat": {},
-      "github_repository": {
-        "owner": "githubusername",
-        "name": "r-shiny-electron"
-      },
-      "windowsStoreConfig": {
-        "packageName": "",
-        "name": "rshinyelectron"
-      }
+  "scripts": {
+    "setup": "yarn install && babel src --out-dir lib && bash setup.sh -ml",
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "build": {
+    "appId": "com.miscl-toolkit-report.app",
+    "mac": {
+      "category": "shiny.app",
+      "asar": false
+    },
+    "win": {
+      "asar": false
     }
   },
   "dependencies": {
-    "axios": "^0.18.0",
-    "electron-compile": "^6.4.3",
-    "electron-squirrel-startup": "^1.0.0",
-    "execa": "^0.10.0"
+    "@babel/runtime": "^7.8.4",
+    "axios": "^0.19.2",
+    "electron-log": "^4.0.7",
+    "execa": "^4.0.0"
   },
   "devDependencies": {
-    "babel-plugin-transform-async-to-generator": "^6.24.1",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-react": "^6.24.1",
-    "electron-forge": "^5.2.2",
-    "electron-prebuilt-compile": "2.0.4",
-    "eslint": "^4.19.1",
-    "eslint-config-airbnb": "^15.1.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-jsx-a11y": "^5.1.1",
-    "eslint-plugin-react": "^7.11.1",
-    "fs-extra": "^7.0.0"
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.8.6",
+    "@babel/plugin-transform-async-to-generator": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.8.3",
+    "@babel/preset-env": "^7.8.6",
+    "@babel/preset-react": "^7.8.3",
+    "@babel/register": "^7.8.6",
+    "electron": "^8.0.2",
+    "electron-builder": "^22.3.2"
   }
 }

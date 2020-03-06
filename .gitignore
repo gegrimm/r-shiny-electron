@@ -1,7 +1,10 @@
-node_modules
-out
-r-mac
-r-win
-package-lock.json
-.Rproj.user
-r-shiny-electron.Rproj
+node_modules/
+yarn.lock
+
+dist/
+r-mac/
+r-win/
+pandoc/
+tinytex/
+
+*.DS_Store

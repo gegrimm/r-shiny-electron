@@ -29,3 +29,13 @@ export const getRPath = (platform) => {
     throw new Error('OS not supported')
   }
 }
+
+export const getTinytexPath = (platform) => {
+  if (platform === 'win32') {
+    return 'win32'
+  } else if (platform === 'darwin') {
+    return 'x86_64-darwin'
+  } else {
+    throw new Error('OS not supported')
+  }
+}

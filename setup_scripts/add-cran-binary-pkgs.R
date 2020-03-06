@@ -1,12 +1,18 @@
 #!/usr/bin/env Rscript
-
 # Script to find dependencies of a pkg list, download binaries and put them
 # In the standalone R library.
 
+args <- commandArgs(trailingOnly=TRUE)
+
 options(repos = "https://cloud.r-project.org")
 
+if (!require(automagic)) {
+  install.packages('automagic')
+}
+
+
 cran_pkgs <- setdiff(unique(c(
-  "shiny",
+  "shiny", "lazyeval",
   automagic::get_dependent_packages("shiny")
 )), "automagic")
 
@@ -14,7 +20,7 @@ install_bins <- function(cran_pkgs, library_path, type, decompress,
                          remove_dirs = c("help", "doc", "tests", "html",
                                          "include", "unitTests",
                                          file.path("libs", "*dSYM"))) {
-  
+
   installed <- list.files(library_path)
   cran_to_install <- sort(setdiff(
     unique(unlist(
@@ -30,19 +36,19 @@ install_bins <- function(cran_pkgs, library_path, type, decompress,
     apply(downloaded, 1, function(x) decompress(x[2], exdir = library_path))
     unlink(downloaded[,2])
   }
-  z <- lapply(list.dirs(library_path, full.names = TRUE, recursive = FALSE), 
+  z <- lapply(list.dirs(library_path, full.names = TRUE, recursive = FALSE),
               function(x) {
                 unlink(file.path(x, remove_dirs), force=TRUE, recursive=TRUE)
               })
   invisible(NULL)
 }
 
-if (dir.exists("r-mac")) {
-  install_bins(cran_pkgs = cran_pkgs, library_path = file.path("r-mac", "library"),
+if (dir.exists("./r-mac") & args[1] == "mac") {
+  install_bins(cran_pkgs = cran_pkgs, library_path = file.path("./r-mac", "library"),
                type = "mac.binary.el-capitan", decompress = untar)
 }
 
-if (dir.exists("r-win")) {
-  install_bins(cran_pkgs = cran_pkgs, library_path = file.path("r-win", "library"),
+if (dir.exists("./r-win") & args[1] == "win") {
+  install_bins(cran_pkgs = cran_pkgs, library_path = file.path("./r-win", "library"),
                type = "win.binary", decompress = unzip)
 }

@@ -4,9 +4,16 @@ import path from 'path'
 import http from 'axios'
 import os from 'os'
 import execa from 'execa'
-import { randomPort, waitFor, getRPath } from './helpers'
+import { randomPort, waitFor, getRPath, getTinytexPath } from './helpers'
+
+const log = require('electron-log')
+
+// for dev/debugging
+log.transports.console.level = 'error'
+log.transports.file.level = 'error'
 
 const rPath = getRPath(os.platform())
+const texPath = getTinytexPath(os.platform())
 
 // signal if a shutdown of the app was requested
 // this is used to prevent an error window once the R session dies
@@ -15,6 +22,8 @@ let shutdown = false
 const rpath = path.join(app.getAppPath(), rPath)
 const libPath = path.join(rpath, 'library')
 const rscript = path.join(rpath, 'bin', 'R')
+const pandocPath = path.join(app.getAppPath(), 'pandoc', 'usr', 'local', 'bin')
+const tinytexPath = path.join(app.getAppPath(), 'tinytex', 'bin', texPath)
 
 const shinyAppPath = path.join(app.getAppPath(), 'shiny')
 
@@ -27,11 +36,6 @@ const backgroundColor = '#2c3e50'
 // At the random port, another webserver is running
 // at any given time there should be 0 or 1 shiny processes
 let rShinyProcess = null
-
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
-  app.quit()
-}
 
 // tries to start a webserver
 // attempt - a counter how often it was attempted to start a webserver
@@ -64,6 +68,7 @@ const tryStartWebserver = async (attempt, progressCallback, onErrorStartup,
       return
     }
     if (shinyRunning) {
+      await shinyKeepAlive()
       await onErrorLater()
     } else {
       await tryStartWebserver(attempt + 1, progressCallback, onErrorStartup, onErrorLater, onSuccess)
@@ -79,11 +84,15 @@ const tryStartWebserver = async (attempt, progressCallback, onErrorStartup,
       'R_HOME_DIR': rpath,
       'RE_SHINY_PORT': shinyPort,
       'RE_SHINY_PATH': shinyAppPath,
+      'RSTUDIO_TINYTEX': tinytexPath,
+      'RSTUDIO_PANDOC': pandocPath,
       'R_LIBS': libPath,
       'R_LIBS_USER': libPath,
       'R_LIBS_SITE': libPath,
-      'R_LIB_PATHS': libPath} }).catch((e) => {
+      'R_LIB_PATHS': libPath
+    } }).catch((e) => {
         shinyProcessAlreadyDead = true
+        log.error(e)
         onError(e)
       })
 
@@ -103,14 +112,16 @@ const tryStartWebserver = async (attempt, progressCallback, onErrorStartup,
         return
       }
     } catch (e) {
-
+      log.error(e)
     }
   }
   await progressCallback({attempt: attempt, code: 'notresponding'})
 
   try {
     rShinyProcess.kill()
-  } catch (e) {}
+  } catch (e) {
+    log.error(e)
+  }
 }
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -188,7 +199,9 @@ app.on('ready', async () => {
   const emitSpashEvent = async (event, data) => {
     try {
       await loadingSplashScreen.webContents.send(event, data)
-    } catch (e) {}
+    } catch (e) {
+      log.error(e)
+    }
   }
 
   // pass the loading events down to the loadingSplashScreen window
@@ -218,6 +231,7 @@ app.on('ready', async () => {
       mainWindow.show()
     })
   } catch (e) {
+    log.error(e)
     await emitSpashEvent('failed')
   }
 })
@@ -237,7 +251,9 @@ app.on('window-all-closed', () => {
   // usually happens automatically if the main process is killed
   try {
     rShinyProcess.kill()
-  } catch (e) {}
+  } catch (e) {
+    log.error(e)
+  }
 })
 
 app.on('activate', () => {
