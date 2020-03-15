@@ -11,7 +11,7 @@ This build relies on [`electron-builder`](https://github.com/electron-userland/e
   -  On Mac OS you may install with homebrew, `brew install innoextract`
   -  On Windows systems you can install with chocolatey, `choco install innoextract`
   - NOTE: You cannot build the Windows target from Mac OS if you have pandoc/latex dependencies. You must use a Windows system in this case.
-  -  NOTE: If you build a Windows target on Mac OS, currently the Mac version of `innoextract` (1.7.x) only alows extraction up to R.exe version 3.5.2
+  -  NOTE: If you build a Windows target on Mac OS, currently the Mac version of `innoextract` (1.7.x) only alows extraction for the R.exe up to version 3.5.2
 
 ## Setup and Build
 
