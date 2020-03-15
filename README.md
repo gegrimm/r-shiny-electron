@@ -1,3 +1,7 @@
+# R Shiny Electron
+
+
+
 # Build for Mac
 
 scripts section of `package.json` should look like this:
