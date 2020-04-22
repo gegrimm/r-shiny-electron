@@ -133,11 +133,13 @@ fi
 #==============================================================================
 if [[ $OSTYPE == "darwin"* ]]
 then
+  export R_HOME_DIR="$PWD/r-mac/"
   echo "Checking if need to fetch R packages required by shiny app."
   ./r-mac/bin/R --vanilla --slave --file=./setup_scripts/add-cran-binary-pkgs.R --args mac
   ./r-mac/bin/R --vanilla --slave --file=./setup_scripts/add-cran-binary-pkgs.R --args win
 elif [[ $OSTYPE == "cygwin" || $OSTYPE == "msys" ]]
 then
+  export R_HOME_DIR="$PWD/r-win/"
   echo "Checking if need to fetch R packages required by shiny app."
   ./r-win/bin/R --vanilla --slave --file=./setup_scripts/add-cran-binary-pkgs.R --args mac
   ./r-win/bin/R --vanilla --slave --file=./setup_scripts/add-cran-binary-pkgs.R --args win

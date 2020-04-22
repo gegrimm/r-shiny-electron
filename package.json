@@ -8,7 +8,6 @@
   "author": "John Doe",
   "license": "MIT",
   "scripts": {
-    "install": "yarn install",
     "setup": "bash setup.sh",
     "build": "babel src --out-dir lib",
     "start": "electron .",
