@@ -76,7 +76,7 @@ then
   then
     ./setup_scripts/get-r-mac.sh
   else
-    echo "R binary already exists for mac, skipping."
+    echo "R binary already exists for mac or not needed, skipping."
   fi
 
   # get pandoc and tinytex if shiny app requires latex/markdown rendering
@@ -84,14 +84,7 @@ then
   then
     ./setup_scripts/get-pandoc-mac.sh
   else
-    echo "pandoc dir already exists; remove if you want to rebuild"
-  fi
-
-  if [[ ! -d ./tinytex && $add_latex == 1 ]]
-  then
-    ./r-mac/bin/R --vanilla --slave --file=./setup_scripts/get-tinytex.R --args mac
-  else
-    echo "tinytex dir already exists; remove if you want to rebuild"
+    echo "pandoc dir already exists or not needed, skipping."
   fi
 fi
 #==============================================================================
@@ -106,7 +99,7 @@ then
   then
     ./setup_scripts/get-r-win.sh
   else
-    echo "R binary already exists for win, skipping."
+    echo "R binary already exists for win or not needed, skipping."
   fi
 
   # get pandoc and tinytex if shiny app requires latex/markdown rendering
@@ -114,16 +107,8 @@ then
   then
     ./setup_scripts/get-pandoc-win.sh
   else
-    echo "pandoc dir already exists; remove if you want to rebuild"
+    echo "pandoc dir already exists or not needed, skipping."
   fi
-
-  if [[ ! -d ./tinytex && $add_latex == 1 ]]
-  then
-    ./r-win/bin/R --vanilla --slave --file=./setup_scripts/get-tinytex.R --args win
-  else
-    echo "tinytex dir already exists; remove if you want to rebuild"
-  fi
-
 fi
 
 #==============================================================================
@@ -135,13 +120,38 @@ if [[ $OSTYPE == "darwin"* ]]
 then
   export R_HOME_DIR="$PWD/r-mac/"
   echo "Checking if need to fetch R packages required by shiny app."
-  ./r-mac/bin/R --vanilla --slave --file=./setup_scripts/add-cran-binary-pkgs.R --args mac
-  ./r-mac/bin/R --vanilla --slave --file=./setup_scripts/add-cran-binary-pkgs.R --args win
+
+  if [[ $build_mac == 1 ]]
+  then
+    ./r-mac/bin/R --vanilla --slave --file=./setup_scripts/add-cran-binary-pkgs.R --args mac
+  fi
+
+  if [[ $build_win == 1 ]]
+  then
+      ./r-mac/bin/R --vanilla --slave --file=./setup_scripts/add-cran-binary-pkgs.R --args win
+  fi
+
+  if [[ ! -d ./tinytex && $add_latex == 1 ]]
+  then
+    ./r-mac/bin/R --vanilla --slave --file=./setup_scripts/get-tinytex.R --args mac
+  fi
 elif [[ $OSTYPE == "cygwin" || $OSTYPE == "msys" ]]
 then
   echo "Checking if need to fetch R packages required by shiny app."
-  ./r-win/bin/R --vanilla --slave --file=./setup_scripts/add-cran-binary-pkgs.R --args mac
-  ./r-win/bin/R --vanilla --slave --file=./setup_scripts/add-cran-binary-pkgs.R --args win
+  if [[ $build_mac == 1 ]]
+  then
+    ./r-win/bin/R --vanilla --slave --file=./setup_scripts/add-cran-binary-pkgs.R --args mac
+  fi
+
+  if [[ $build_win == 1 ]]
+  then
+    ./r-win/bin/R --vanilla --slave --file=./setup_scripts/add-cran-binary-pkgs.R --args win
+  fi
+
+  if [[ ! -d ./tinytex && $add_latex == 1 ]]
+  then
+    ./r-win/bin/R --vanilla --slave --file=./setup_scripts/get-tinytex.R --args win
+  fi
 else
   echo "OS not properly detected."
   echo "If are you using OS other mac or win, check 'setup.sh' and modify as needed."
