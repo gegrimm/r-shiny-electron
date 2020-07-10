@@ -19,10 +19,12 @@
     "appId": "com.r-shiny-electron.app",
     "mac": {
       "category": "shiny.app",
-      "asar": false
+      "asar": false,
+      "files": ["!setup_scripts/", "!setup.sh"]
     },
     "win": {
-      "asar": false
+      "asar": false,
+      "files": ["!setup_scripts/", "!setup.sh"]
     }
   },
   "dependencies": {
